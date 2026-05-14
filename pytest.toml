@@ -1,0 +1,5 @@
+[pytest]
+
+markers = [
+    "example: demonstration of markers"
+]
