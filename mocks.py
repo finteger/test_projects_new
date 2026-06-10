@@ -9,8 +9,30 @@ def get_user_data(user_id):
     return response.json()
 
 class TestGetUserData(unittest.TestCase):
-    #'patch' replaces 'requests.get' with a mock during the test
-    mock_response = Mock()
     
-    #Define what .json() should return when called on the mock response
-    response_dict = {'name': 'John Doe', 'email': 'john.doe@example.com'}
+    #patch decorate used for dependency injection
+    @patch('requests.get')
+    def test_get_user_data(self, mock_get):
+        #'patch' replaces 'requests.get' with a mock during the test
+        mock_response = Mock()
+        
+        #Define what .json() should return when called on the mock response
+        response_dict = {'name': 'John Doe', 'email': 'john.doe@example.com'}
+        mock_response.json.return_value = response_dict
+        
+        #configure the mocked 'requests.get' to return our mock response
+        mock_get.return_value = mock_response
+        
+        #call the function under test
+        user_data = get_user_data(1)
+        
+        #verify requests.get has been called with the correct URL
+        mock_get.assert_called_with('https://api.example.com/users/1')
+        
+        #assert that that the returned mock user data is same as real user data
+        self.assertEqual(user_data, response_dict)      
+        
+        
+if __name__ == '__main__':
+    unittest.main()
+    
